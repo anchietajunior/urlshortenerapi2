@@ -8,12 +8,16 @@ end
 
 namespace '/api/v1' do
 
+  error Mongoid::Errors::DocumentNotFound do
+    halt(404, { message: "Url not found" }.to_json)
+  end
+
   get '/urls' do
     Url.all.to_json
   end
 
   get '/urls/:shortened_url' do |shortened_url|
-    Url.where(shortened_url: shortened_url).last.to_json
+    Url.find_by(shortened_url: shortened_url).to_json
   end
 
   post '/urls' do
@@ -23,4 +27,8 @@ namespace '/api/v1' do
   end
 
   get('/version') { "1.0" }
+
+  not_found do
+    { message: "Not found" }.to_json
+  end
 end
