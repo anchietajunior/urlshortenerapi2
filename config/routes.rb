@@ -12,6 +12,16 @@ namespace '/api/v1' do
     halt(404, { message: "Url not found" }.to_json)
   end
 
+  post '/users' do
+    headers('Content-Type' => :json)
+    user = User.new(JSON.parse(request.body.read))
+    if user.save
+      user.to_json
+    else
+      user.errors.to_json
+    end
+  end
+
   get '/urls' do
     Url.all.to_json
   end
