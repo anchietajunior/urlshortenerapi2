@@ -1,9 +1,14 @@
 require 'sinatra/contrib'
 require 'sinatra/reloader'
 require 'sinatra/namespace'
+require './services/users/user_creator_service'
 
 get '/' do
   erb :index
+end
+
+before '/api/*' do
+  p "SECURED ROUTE ===================== >>>>>"
 end
 
 namespace '/api/v1' do
@@ -14,11 +19,11 @@ namespace '/api/v1' do
 
   post '/users' do
     headers('Content-Type' => :json)
-    user = User.new(JSON.parse(request.body.read))
-    if user.save
-      user.to_json
+    result = Users::UserCreatorService.call(JSON.parse(request.body.read))
+    if result.success? 
+      result.value.to_json
     else
-      user.errors.to_json
+      result.error.to_json
     end
   end
 
