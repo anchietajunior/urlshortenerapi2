@@ -2,6 +2,7 @@ require 'sinatra/contrib'
 require 'sinatra/reloader'
 require 'sinatra/namespace'
 require './services/users/user_creator_service'
+require './services/urls/url_creator_service'
 
 get '/' do
   erb :index
@@ -37,8 +38,12 @@ namespace '/api/v1' do
 
   post '/urls' do
     headers('Content-Type' => :json)
-    url = Url.new(JSON.parse(request.body.read)).save
-    url.to_json
+    result = Urls::UrlCreatorService.call(JSON.parse(request.body.read))
+    if result.success?
+      result.value.to_json
+    else
+      result.error.to_json
+    end
   end
 
   get('/version') { "1.0" }

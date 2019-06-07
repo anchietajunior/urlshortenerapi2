@@ -10,9 +10,7 @@ module Users
     def call
       Result.new(true, nil, create!)
     rescue StandardError => e
-      p "ERROR =============>>>>"
-      p e
-      Result.new(false, { message: e.summary }, nil)
+      Result.new(false, { error: e.summary }, nil)
     end
 
     private
@@ -20,7 +18,8 @@ module Users
     attr_accessor :params
 
     def encrypted_password
-      @password ||= params["password"].present? ? BCrypt::Password.create(params["password"]) : nil
+      return BCrypt::Password.create(params["password"]) if params["password"].present?
+      nil
     end
 
     def create!
