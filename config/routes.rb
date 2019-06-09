@@ -8,14 +8,30 @@ get '/' do
   erb :index
 end
 
-before '/api/*' do
-  p "SECURED ROUTE ===================== >>>>>"
+before '/api/v1/*' do
+  p "HEADERS =================>>>> #{headers}"
+  p "REQUEST =================>>>> #{request}"
+  @result = Authentication::AuthenticationService.call(headers)
+  halt 401, {error: 'Unauthorized'}.to_json unless @result.success?
+end
+
+post '/api/login' do
+
 end
 
 namespace '/api/v1' do
 
   error Mongoid::Errors::DocumentNotFound do
     halt(404, { message: "Url not found" }.to_json)
+  end
+
+  post '/login' do
+    result = Authentication::TokenGeneratorService.call(session_params[:email], session_params[:password])
+    if result.success?
+      render json: { jwt: result.value }, status: :ok
+    else
+      render json: { errors: result.error }, status: :bad
+    end
   end
 
   post '/users' do
