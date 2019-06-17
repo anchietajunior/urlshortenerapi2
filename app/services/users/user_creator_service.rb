@@ -1,5 +1,5 @@
 require 'bcrypt'
-require './services/app_service'
+require './app/services/app_service'
 
 module Users
   class UserCreatorService < AppService

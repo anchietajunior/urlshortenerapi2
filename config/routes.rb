@@ -1,22 +1,15 @@
 require 'sinatra/contrib'
 require 'sinatra/reloader'
 require 'sinatra/namespace'
-require './services/users/user_creator_service'
-require './services/urls/url_creator_service'
 
 get '/' do
   erb :index
 end
 
-before '/api/v1/*' do
-  p "HEADERS =================>>>> #{headers}"
-  p "REQUEST =================>>>> #{request}"
-  @result = Authentication::AuthenticationService.call(headers)
-  halt 401, {error: 'Unauthorized'}.to_json unless @result.success?
-end
-
-post '/api/login' do
-
+before '/api/v1/urls' do
+  headers('Content-Type' => :json)
+  result = Authentication::AuthenticationService.call(headers)
+  halt 401, {error: 'Unauthorized'}.to_json unless result.success?
 end
 
 namespace '/api/v1' do
@@ -26,11 +19,11 @@ namespace '/api/v1' do
   end
 
   post '/login' do
-    result = Authentication::TokenGeneratorService.call(session_params[:email], session_params[:password])
+    result = Authentication::TokenGeneratorService.call(JSON.parse(request.body.read))
     if result.success?
-      render json: { jwt: result.value }, status: :ok
+      { jwt: result.value }.to_json
     else
-      render json: { errors: result.error }, status: :bad
+      { errors: result.error }.to_json
     end
   end
 

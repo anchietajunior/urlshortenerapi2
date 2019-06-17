@@ -1,4 +1,4 @@
-require './services/app_service'
+require './app/services/app_service'
 
 module Authentication
   class AuthenticationService < AppService
