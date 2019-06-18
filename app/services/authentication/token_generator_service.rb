@@ -8,8 +8,6 @@ module Authentication
     end
 
     def call
-      p "USER =================>>>> #{user}"
-      p "ENCRYPTED_PASSWORD =====>> #{encrypted_password}"
       Result.new(true, nil, authenticate!)
     rescue StandardError => e
       Result.new(false, e.message, nil)
@@ -20,19 +18,16 @@ module Authentication
     attr_accessor :params
 
     def user
-      @user ||= User.find_by(email: params["email"])
-    end
-
-    def encrypted_password
-      BCrypt::Password.new(params["password"])
+      User.find_by(email: params['email'])
     end
 
     def valid_password?
-      encrypted_password == user.password
+      encrypted_password = BCrypt::Password.new(user.password)
+      encrypted_password == params['password']
     end
 
     def authenticate!
-      return Authentication::JwtService.encode(user_id: user.id) if user.present? && valid_password?
+      return Authentication::JwtService.encode(user_id: user.id) if valid_password?
       raise "Invalid Credentials"
     end
   end

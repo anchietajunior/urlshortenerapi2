@@ -8,7 +8,7 @@ end
 
 before '/api/v1/urls' do
   headers('Content-Type' => :json)
-  result = Authentication::AuthenticationService.call(headers)
+  result = Authentication::AuthenticationService.call(request.env['HTTP_AUTHORIZATION'])
   halt 401, {error: 'Unauthorized'}.to_json unless result.success?
 end
 
@@ -27,17 +27,18 @@ namespace '/api/v1' do
     end
   end
 
-  post '/users' do
+  post '/subscribe' do
     headers('Content-Type' => :json)
     result = Users::UserCreatorService.call(JSON.parse(request.body.read))
     if result.success? 
-      result.value.to_json
+      { created: result.value }.to_json
     else
-      result.error.to_json
+      { errors: result.error }.to_json
     end
   end
 
   get '/urls' do
+    p "HEADERS: #{headers}"
     Url.all.to_json
   end
 

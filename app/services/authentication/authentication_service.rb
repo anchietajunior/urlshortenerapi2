@@ -2,12 +2,11 @@ require './app/services/app_service'
 
 module Authentication
   class AuthenticationService < AppService
-    def initialize(headers)
-      @headers = headers
+    def initialize(authorization)
+      @authorization = authorization
     end
 
     def call
-      p "AUTHENTICATION ==============>>>>> #{headers}"
       authenticate!
     rescue StandardError => e
       Result.new(false, e.message, nil)
@@ -15,10 +14,10 @@ module Authentication
 
     private
 
-    attr_accessor :headers, :token
+    attr_accessor :authorization, :token
 
     def token
-      @token ||= headers['Authorization'].present? ? headers['Authorization'].split(' ').last : nil 
+      @token ||= authorization.present? ? authorization.split(' ').last : nil 
     end
 
     def user
@@ -26,7 +25,7 @@ module Authentication
     end
 
     def decode_jwt_token
-      Authentication::JwtService.decode(token)["user_id"]
+      Authentication::JwtService.decode(token)
     end
 
     def authenticate!
