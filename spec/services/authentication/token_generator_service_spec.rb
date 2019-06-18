@@ -12,10 +12,10 @@ RSpec.describe Authentication::TokenGeneratorService do
   let!(:user) { User.create!(name: "Anchieta", email: "user@testing.com", password: password) }
 
   let(:params) do
-    {
+    '{
       "email": "user@testing.com",
       "password": "12345678"
-    }
+    }'
   end
 
   after(:each) do
@@ -23,12 +23,11 @@ RSpec.describe Authentication::TokenGeneratorService do
   end
 
   let(:service) do
-    described_class.call(params)
+    described_class.call(JSON.parse(params))
   end
 
   describe '#call' do
     it 'has a success? true value' do
-      p "SERVICE: #{service}"
       expect(service.success?).to be_truthy
     end
   end

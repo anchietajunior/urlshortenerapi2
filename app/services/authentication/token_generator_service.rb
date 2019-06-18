@@ -18,12 +18,12 @@ module Authentication
     attr_accessor :params
 
     def user
-      User.find_by(email: params['email'])
+      User.find_by(email: params["email"])
     end
 
     def valid_password?
       encrypted_password = BCrypt::Password.new(user.password)
-      encrypted_password == params['password']
+      encrypted_password == params["password"]
     end
 
     def authenticate!
