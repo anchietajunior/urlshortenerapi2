@@ -1,8 +1,7 @@
 # URL Shortener API with Sinatra
 
-## Baby steps
+## Running tests
 
 ```shell_session
-mkdir urlshortenerapi
-touch app.rb
+rspec
 ```
